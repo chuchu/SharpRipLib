@@ -8,7 +8,7 @@ namespace DemoApplication
     class Program
     {
         static void Main(string[] args)
-        {
-        }
+        {            
+        }        
     }
 }

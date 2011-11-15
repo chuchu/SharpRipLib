@@ -27,41 +27,70 @@ namespace SharpRipLib.CDRipLib
 {
     public static class CDRipLib
     {
+        /// <summary>
+        /// Call Init before anything else
+        /// </summary>
+        /// <param name="nTransportLayer"></param>
+        /// <returns></returns>
         [DllImport("CDRip.dll", EntryPoint = "CR_Init", CallingConvention = CallingConvention.StdCall)]
         public static extern long CR_Init(int nTransportLayer);
 
+        /// <summary>
+        /// Call DeInit when ripping library is no longer needed.
+        /// </summary>
+        /// <returns></returns>
         [DllImport("CDRip.dll")]
         public static extern long CR_DeInit();
 
+        /// <summary>
+        /// Get the DLL version number.
+        /// </summary>
+        /// <returns>
+        /// The DLL version number
+        /// </returns>
         [DllImport("CDRip.dll")]
         public static extern int CR_GetCDRipVersion();
 
+        /// <summary>
+        /// Get the number of detected CD-ROM drives.
+        /// </summary>
+        /// <returns>
+        /// Number of detected CD-ROM drives.
+        /// </returns>
         [DllImport("CDRip.dll")]
-        static extern int CR_GetNumCDROM();
-
-        //DLLEXPORT CDEX_ERR CRCCONV CR_GetCDROMParameters(CDROMPARAMS *pParam);
+        public static extern int CR_GetNumCDROM();
+        
+        /// <summary>
+        /// Get the CDROM parameters of the active drive.
+        /// </summary>
+        /// <param name="buf"></param>
+        /// <returns></returns>
         [DllImport("CDRip.dll")]
-        static extern int CR_GetCDROMParameters(IntPtr buf);
+        public static extern int CR_GetCDROMParameters(IntPtr buf);
 
         /// <summary>
         /// Start ripping section, output is fetched to WriteBufferFunc.
         /// Data is extracted from dwStartSector to dwEndSector.
         /// </summary>        
         [DllImport("CDRip.dll")]
-        static extern int CR_OpenRipper(out int plBufferSize, int dwStartSector, int dwEndSector);
+        public static extern int CR_OpenRipper(out int plBufferSize, int dwStartSector, int dwEndSector);
 
         [DllImport("CDRip.dll")]
-        static extern void CR_SetActiveCDROM(int nActiveDrive);
+        public static extern void CR_SetActiveCDROM(int nActiveDrive);
 
+        /// <summary>
+        /// Read the table of contents.
+        /// </summary>
+        /// <returns></returns>
         [DllImport("CDRip.dll")]
-        static extern int CR_ReadToc();
+        public static extern int CR_ReadToc();
 
         /// <summary>
         /// Get the number of TOC entries, including the lead out.
         /// </summary>
         /// <returns></returns>
         [DllImport("CDRip.dll")]
-        static extern int CR_GetNumTocEntries();
+        public static extern int CR_GetNumTocEntries();
 
         /// <summary>
         /// Close the ripper, has to be called when the ripping process is completed (i.e 100%) 
@@ -69,7 +98,7 @@ namespace SharpRipLib.CDRipLib
         /// </summary>
         /// <returns></returns>
         [DllImport("CDRip.dll")]
-        static extern int CR_CloseRipper();
+        public static extern int CR_CloseRipper();
 
         /// <summary>
         /// Indicates how far the ripping process is right now
@@ -77,13 +106,13 @@ namespace SharpRipLib.CDRipLib
         /// </summary>
         /// <returns></returns>
         [DllImport("CDRip.dll")]
-        static extern int CR_GetPercentCompleted();
+        public static extern int CR_GetPercentCompleted();
 
         /// <summary>
         /// Get the TOC entry
         /// </summary>
         [DllImport("CDRip.dll")]
-        static extern TOCENTRY CR_GetTocEntry(int nTocEntry);
+        public static extern TOCENTRY CR_GetTocEntry(int nTocEntry);
 
         /// <summary>
         /// Rip a chunk from the CD, pbtStream contains the ripped data, pNumBytes the
@@ -91,6 +120,6 @@ namespace SharpRipLib.CDRipLib
         /// DLLEXPORT CDEX_ERR CRCCONV CR_RipChunk(BYTE *pbtStream, LONG *pNumBytes, BOOL &bAbort);
         /// </summary>
         [DllImport("CDRip.dll")]
-        static extern int CR_RipChunk(IntPtr pbtStream, out int pNumBytes, out bool abort);
+        public static extern int CR_RipChunk(IntPtr pbtStream, out int pNumBytes, out bool abort);
     }
 }
