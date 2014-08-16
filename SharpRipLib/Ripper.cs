@@ -20,7 +20,9 @@ namespace SharpRipLib
 
         public event EventHandler<RippingErrorEventArgs> OnRippingError;
 
-        private Ripper()
+        private ITrackTypeConverter _TrackTypeConverter = new TrackTypeConverter();
+
+        public Ripper()
         {
             SharpRipLib.CDRipLib.CDRipLib.CR_Init(1);
         }
@@ -41,28 +43,35 @@ namespace SharpRipLib
             int numberOfBytesRead = -1;
             if (success == 0)
             {
-                while (numberOfBytesRead != 0)
+                try
                 {
-                    IntPtr pbtStream = Marshal.AllocHGlobal(bufferSize * Marshal.SizeOf(typeof(byte)));
-                    SharpRipLib.CDRipLib.CDRipLib.CR_RipChunk(pbtStream, out numberOfBytesRead, out abort);
-
-                    if (numberOfBytesRead != 0)
+                    while (numberOfBytesRead != 0)
                     {
-                        byte[] byteArray = new byte[numberOfBytesRead];
-                        Marshal.Copy(pbtStream, byteArray, 0, numberOfBytesRead);
+                        IntPtr pbtStream = Marshal.AllocHGlobal(bufferSize * Marshal.SizeOf(typeof(byte)));
+                        SharpRipLib.CDRipLib.CDRipLib.CR_RipChunk(pbtStream, out numberOfBytesRead, out abort);
 
-                        if (OnDataRipped != null)
+                        if (numberOfBytesRead != 0)
                         {
-                            OnDataRipped(this, new DataRippedEventArgs(byteArray));
+                            byte[] byteArray = new byte[numberOfBytesRead];
+                            Marshal.Copy(pbtStream, byteArray, 0, numberOfBytesRead);
+
+                            if (OnDataRipped != null)
+                            {
+                                OnDataRipped(this, new DataRippedEventArgs(byteArray));
+                            }
+                        }
+                        else
+                        {
+                            if (OnRippingFinished != null)
+                            {
+                                OnRippingFinished(this, null);
+                            }
                         }
                     }
-                    else
-                    {
-                        if (OnRippingFinished != null)
-                        {
-                            OnRippingFinished(this, null);
-                        }
-                    }
+                }
+                finally
+                {
+                    SharpRipLib.CDRipLib.CDRipLib.CR_CloseRipper();
                 }
             }
         }
@@ -88,6 +97,31 @@ namespace SharpRipLib
         public int GetVersion()
         {
             return SharpRipLib.CDRipLib.CDRipLib.CR_GetCDRipVersion();
+        }
+
+        public IEnumerable<ITrack> GetTracks()
+        {
+            List<ITrack> trackList = new List<ITrack>();
+            
+            SharpRipLib.CDRipLib.CDRipLib.CR_ReadToc();
+
+            int trackCount = SharpRipLib.CDRipLib.CDRipLib.CR_GetNumTocEntries();
+
+            for (int i = 0; i < trackCount; i++)
+            {
+                TOCENTRY currentTocEntry = SharpRipLib.CDRipLib.CDRipLib.CR_GetTocEntry(i);
+                TOCENTRY nextTocEntry = SharpRipLib.CDRipLib.CDRipLib.CR_GetTocEntry(i+1);
+
+                Track track = new Track(
+                    currentTocEntry.btTrackNumber,
+                    currentTocEntry.dwStartSector,
+                    nextTocEntry.dwStartSector - 1,
+                    _TrackTypeConverter.FromFlag(currentTocEntry.btFlag));
+
+                trackList.Add(track);
+            }
+
+            return trackList;
         }
 
         public void Dispose()
