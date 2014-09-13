@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F2A4D157-A569-49C6-B38A-707615C9F51E}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{EE74635F-0A65-420E-BD3B-F07B33B0B21D}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SharpRipLib</RootNamespace>
-    <AssemblyName>SharpRipLib</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>SharpRipLib.SharpRipper</RootNamespace>
+    <AssemblyName>SharpRipper</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine">
+      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,29 +44,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CDRipLibException.cs" />
-    <Compile Include="CDRipLib\CDRipLib.cs" />
-    <Compile Include="CDRipLib\CDROMPARAMS.cs" />
-    <Compile Include="CDRipLib\Constants.cs" />
-    <Compile Include="CDRipLib\DRIVETABLE.cs" />
-    <Compile Include="CDRipLib\DRIVETYPE.cs" />
-    <Compile Include="CDRipLib\ENABLEMODE.cs" />
-    <Compile Include="CDRipLib\ENDIAN.cs" />
-    <Compile Include="CDRipLib\ErrorCodes.cs" />
-    <Compile Include="CDRipLib\READMETHOD.cs" />
-    <Compile Include="CDRipLib\SETSPEED.cs" />
-    <Compile Include="CDRipLib\TOCENTRY.cs" />
-    <Compile Include="CDRipLib\TransportLayer.cs" />
-    <Compile Include="EventArgs\DataRippedEventArgs.cs" />
-    <Compile Include="EventArgs\RippingErrorEventArgs.cs" />
-    <Compile Include="ITrack.cs" />
-    <Compile Include="ITrackTypeConverter.cs" />
+    <Compile Include="CommandLineOptions.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ripper.cs" />
-    <Compile Include="RipperToken.cs" />
-    <Compile Include="Track.cs" />
-    <Compile Include="TrackType.cs" />
-    <Compile Include="TrackTypeConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SharpRipLib\SharpRipLib.csproj">
+      <Project>{f2a4d157-a569-49c6-b38a-707615c9f51e}</Project>
+      <Name>SharpRipLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

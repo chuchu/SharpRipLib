@@ -31,16 +31,16 @@ namespace SharpRipLib.CDRipLib
         /// Call Init before anything else
         /// </summary>
         /// <param name="nTransportLayer"></param>
-        /// <returns></returns>
-        [DllImport("CDRip.dll", EntryPoint = "CR_Init", CallingConvention = CallingConvention.StdCall)]
-        public static extern long CR_Init(int nTransportLayer);
+        /// <returns>CDEX_ERR</returns>
+        [DllImport("CDRip.dll")]
+        public static extern int CR_Init(int nTransportLayer);
 
         /// <summary>
         /// Call DeInit when ripping library is no longer needed.
         /// </summary>
         /// <returns></returns>
         [DllImport("CDRip.dll")]
-        public static extern long CR_DeInit();
+        public static extern int CR_DeInit();
 
         /// <summary>
         /// Get the DLL version number.
@@ -81,7 +81,7 @@ namespace SharpRipLib.CDRipLib
         /// <summary>
         /// Read the table of contents.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>CDEX_ERR</returns>
         [DllImport("CDRip.dll")]
         public static extern int CR_ReadToc();
 

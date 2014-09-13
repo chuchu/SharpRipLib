@@ -8,7 +8,7 @@ using SharpRipLib.EventArgs;
 
 namespace SharpRipLib
 {
-    public class Ripper : IDisposable
+    public sealed class Ripper : IDisposable
     {
         private static Ripper _Instance;
 
@@ -24,7 +24,7 @@ namespace SharpRipLib
 
         public Ripper()
         {
-            SharpRipLib.CDRipLib.CDRipLib.CR_Init(1);
+            //SharpRipLib.CDRipLib.CDRipLib.CR_Init(1);
         }
 
         public void RippTrack()
@@ -101,27 +101,35 @@ namespace SharpRipLib
 
         public IEnumerable<ITrack> GetTracks()
         {
-            List<ITrack> trackList = new List<ITrack>();
-            
-            SharpRipLib.CDRipLib.CDRipLib.CR_ReadToc();
-
-            int trackCount = SharpRipLib.CDRipLib.CDRipLib.CR_GetNumTocEntries();
-
-            for (int i = 0; i < trackCount; i++)
+            using (RipperToken ripper = new RipperToken())
             {
-                TOCENTRY currentTocEntry = SharpRipLib.CDRipLib.CDRipLib.CR_GetTocEntry(i);
-                TOCENTRY nextTocEntry = SharpRipLib.CDRipLib.CDRipLib.CR_GetTocEntry(i+1);
+                List<ITrack> trackList = new List<ITrack>();
 
-                Track track = new Track(
-                    currentTocEntry.btTrackNumber,
-                    currentTocEntry.dwStartSector,
-                    nextTocEntry.dwStartSector - 1,
-                    _TrackTypeConverter.FromFlag(currentTocEntry.btFlag));
+                int errorCode = SharpRipLib.CDRipLib.CDRipLib.CR_ReadToc();
 
-                trackList.Add(track);
+                if (errorCode != ErrorCodes.CDEX_OK)
+                {
+                    throw new CDRipLibException(errorCode, string.Empty);
+                }
+
+                int trackCount = SharpRipLib.CDRipLib.CDRipLib.CR_GetNumTocEntries();
+
+                for (int i = 0; i < trackCount; i++)
+                {
+                    TOCENTRY currentTocEntry = ripper.GetTocEntry(i);
+                    TOCENTRY nextTocEntry = ripper.GetTocEntry(i + 1);
+
+                    Track track = new Track(
+                        currentTocEntry.btTrackNumber,
+                        currentTocEntry.dwStartSector,
+                        nextTocEntry.dwStartSector - 1,
+                        _TrackTypeConverter.FromFlag(currentTocEntry.btFlag));
+
+                    trackList.Add(track);
+                }
+
+                return trackList;
             }
-
-            return trackList;
         }
 
         public void Dispose()
@@ -132,7 +140,7 @@ namespace SharpRipLib
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             // If you need thread safety, use a lock around these operations, as well as in your methods that use the resource.
             if (!_IsDisposed)
@@ -145,7 +153,7 @@ namespace SharpRipLib
                 // Release unmanaged resources.
                 // Set large fields to null.
                 // Call Dispose on your base class.
-                SharpRipLib.CDRipLib.CDRipLib.CR_DeInit();
+                //SharpRipLib.CDRipLib.CDRipLib.CR_DeInit();
 
                 _IsDisposed = true;
             }
